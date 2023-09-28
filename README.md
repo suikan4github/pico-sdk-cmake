@@ -42,12 +42,13 @@ CMakeコンフィギュレーション時にpico-sdkを自動的に取得でき�
 driver ディレクトリを新設し、gpio_init.* をそこに移しています。
 
 考え方としては algorithm ディレクトリを作ったときと同じですが、
-pico-sdk にアクセスする点が違います。pico-sdk の CMakeLists.txt は
+driver の中から pico-sdk にアクセスする点が違います。
+
+pico-sdk の CMakeLists.txt は
 複雑な前処理や後処理を自動的でやってくれて便利なのですが、あまりに
 うまく複雑さを遮蔽しているために困ることがあります。
-
 この場合がそうで、pico-sdk を使う開発では pico-sdk にアクセスする
-ライブラリのビルドが一筋縄ではいきません。
+ライブラリのビルドは一筋縄ではいきません。
 
 ```
 .
@@ -135,20 +136,20 @@ add_subdirectory(driver)
 ```
 
 gpioinit.c が driver サブディレクトリに移ったため、
-add_executableのリストから消えています。
+add_executableのリストから消えています。今や add_executable() のソース・コードは main.c だけです。
 
 target_link_librraries と target_include_directories に
 driver が追加されました。また、 add_subdirectory() で
 driver をビルドするモジュールとして追加しています。
 
-ブートローダーファイルは build/src/blink.uf2 です。
+ブートローダーファイルは build/src/blink.uf2 です。これは subdir 構成と変わりません。
 
 さて、先に変更点だけ示しましたが、INTERFACE ライブラリとは
 何でしょうか。
 
-CMake の INTERFACE ライブラリは、実体を持たないライブラリです。STATIC ライブラリはスタティック・リンキング・ライブラリ
-としてファイルが生成されます。そして、ビルドは当該ディレクトリ
-で行われます。
+CMake の INTERFACE ライブラリは、実体を持たないライブラリです。add_library() で　STATIC と宣言された
+ライブラリはスタティック・リンキング・ライブラリとして実体が生成されます。
+そして、ビルドは当該ディレクトリで行われます。
 
 しかしながら、INTERFACE ライブラリは実体がないため、当該
 ディレクトリではコンパイルが行われません。単にソース・ファイルが
@@ -159,10 +160,10 @@ CMake の INTERFACE ライブラリは、実体を持たないライブラリで
 普通はこんな奇妙なことをする必要はありません。ところが、pico-sdk の CMake では必要になります。pico-sdk の CMake は
 SDK のインクルードディレクトリを add_executable() にだけ
 渡します。そして、add_library() を行うときにそのパスを知る
-方法はありません。そのため、add_library() をつかって SDK 
-依存のコードをコンパイルすると、インクルードファイルが見つからずにエラー終了します。
+方法はありません。そのため、add_library( STATIC ) をつかって SDK 
+依存のコードをコンパイルすると、インクルードファイルが見つからずにエラー終了してしまうので。
 
-CMake のINTERFACE ライブラリという奇妙な仕掛けを使ったのは
+CMake のINTERFACE ライブラリという奇妙な仕掛けを使うのは
 このためです。INTERFACE ライブラリのソース・ファイルは
 コンパイルが add_executable() のソース・ファイルと同じ
 文脈で行われます。そのため、SDK のインクルード・パスを
