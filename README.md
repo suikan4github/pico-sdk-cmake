@@ -16,7 +16,7 @@ Raspberry Pi Picoのプログラム開発はディレクトリ構成で躓きが
 [basic](https://github.com/suikan4github/pico-sdk-cmake/tree/basic)      | すべてのソース・ファイルをプロジェクトルートに置きます
 [src](https://github.com/suikan4github/pico-sdk-cmake/tree/src)        | すべてのソース・ファイルをsrcディレクトリに置きます
 [subdir](https://github.com/suikan4github/pico-sdk-cmake/tree/subdir)     | 一部のソース・ファイルをサブディレクトリに置きます
-[subdir_sdk](subdir_sdk) | サブディレクトリに置いたファイルからSDKを参照します
+[subdir_sdk](https://github.com/suikan4github/pico-sdk-cmake/tree/subdir_sdk) | サブディレクトリに置いたファイルからSDKを参照します
 
 各々のタグのREADMEではその構成の解説を読むことができます。
 
