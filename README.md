@@ -8,7 +8,7 @@ Explain how CMake should be configured for the RasPi Pico development with pico-
 pico-sdk固有の癖とcmakeの理解しにくさが組み合わさっているため、
 Raspberry Pi Picoのプログラム開発はディレクトリ構成で躓きがちです。
 
-そこで、このプロジェクトではgitタグを使って複数の構成を
+そこで、このプロジェクトではgitブランチを使って複数の構成を
 紹介し、それぞれについて説明します。
 
 タグ       | 説明
