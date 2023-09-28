@@ -3,17 +3,18 @@
 # になる。
 add_executable(blink
         main.c
-        initgpio.c
         )
 
 # blinkプログラムがpico_stdlibライブラリを使うことを宣言する。
-target_link_libraries(blink
+target_link_libraries(blink PUBLIC
                         algorithm
+                        driver
                         pico_stdlib)
 
 # サブディレクトリalgorithmをインクルード・パスに追加する
 target_include_directories(blink PUBLIC 
-                        algorithm )
+                        algorithm 
+                        driver)
 
 # pico-sdkが用意した関数
 # blinkプログラムからブートローダ形式のファイルを作る
@@ -21,7 +22,8 @@ target_include_directories(blink PUBLIC
 # 出力される
 pico_add_extra_outputs(blink)
 
-# algorithm サブディレクトリをビルドに追加する
+# サブディレクトリをビルドに追加する
 add_subdirectory(algorithm)
+add_subdirectory(driver)
 
 
