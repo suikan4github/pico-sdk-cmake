@@ -37,33 +37,49 @@ CMakeコンフィギュレーション時にpico-sdkを自動的に取得でき�
 
 詳しくはpico-sdkを参照してください。
 
-# basic構成
-この構成は、[pico-sdk](https://github.com/raspberrypi/pico-sdk)が紹介している方法です。
+# src構成
+この構成は、すべてのソース・ファイルをsrcディレクトリに格納しています。
 
-すべてのソース・ファイルとヘッダー・ファイルがプロジェクトの
-ルートディレクトリに置かれています。構成としてはシンプルですが、ルート・ディレクトリはごちゃごちゃしてしまいます。
+ソース・ファイルをルート・ディレクトリの下のディレクトリに
+格納する構成はオーソドックスと言えます。
 
 ```
 .
 ├── CMakeLists.txt
-├── getduration.c
-├── getduration.h
-├── initgpio.c
-├── initgpio.h
 ├── LICENSE
-├── main.c
 ├── pico_sdk_import.cmake
-└── README.md
+├── README.md
+└── src
+    ├── CMakeLists.txt
+    ├── getduration.c
+    ├── getduration.h
+    ├── initgpio.c
+    ├── initgpio.h
+    └── main.c
 ```
+CMakeのルールに従い、ルート・ディレクトリとsrcディレクトリの双方に
+CMakeLists.txt が必要です。
 
-特にOSSの場合、プロジェクトのルート・ディレクトリにはREADMEやCHANGELOGといった
-プロジェクト自身の説明をするファイルが置かれています。ここにソース・ファイルを全部置くのはあまり良い方法ではありません。
-
-CMakeLists.txtの後半は以下のようになっています。
+ルート・ディレクトリの CMakeLists.txt の後半は以下のようになっています。
 ```CMake
 # --------------------------------------------------
 # 以下が例題ごとに変わる
 
+# srcサブディレクトリをプロジェクトに加える
+add_subdirectory("src")
+```
+一行だけになりました。
+
+add_subdirectory() は CMake の命令です。この命令は指定したサブディレクトリを
+プロジェクトに追加します。プロジェクトに追加するのであって、インクルード
+しているわけではないことに注意してください。
+
+CMakeでは減速として各ディレクトリの CMakeLists.txt がそのディレクトリでの
+ビルドのルールを定義します。add_subdirectory() は、指定したディレクトリでの
+ビルドを、プロジェクトのビルドに組み込む命令です。
+
+src/CMakeLists.txt は以下のようになっています。
+```CMake
 # blinkプログラムがmain.cとinit.cからなることを宣言する
 # add_executable()で宣言した名前(blink)は実行ファイルの名前
 # になる。
@@ -81,21 +97,15 @@ target_link_libraries(blink pico_stdlib)
 # ブートローダーファイル(blink.uf2)はbuildディレクトリに
 # 出力される
 pico_add_extra_outputs(blink)
+
 ```
-ここには特にひねりはありません。
 
+これは、[basic](https://github.com/suikan4github/pico-sdk-cmake/tree/basic) 構成のCMakeLists.txtの後半部分そのものです。
 
-add_executable()はCMakeの関数で、blinkという
-ターゲットプログラムのソースコードがmainc, initgpio.c, getduration.cの３つ
-であることを宣言しています。
+CMakeLists.txt の内容は変わりませんが、pico_add_extra_outputs() が
+src ディレクトリに移ったため、生成物のディレクトリも変わります。
 
-target_link_librariyはblinkプログラムがpico-sdkのpico_stdlibライブラリを使用している
-（pico_stdlibライブラリに依存している）ことを宣言しています。
-
-pico_add_extra_outputs()はpico-sdkの関数です。この関数はblinkプログラムに対して
-実行ファイル(ELF)だけではなく、ブートストラップ・ロード用のファイルも作るよう宣言
-しています。
-
+具体的には、ブートローダーファイルは build/src/blink.uf2 になります。
 
 # ビルド
 このプロジェクトは以下の環境でビルド可能です。
