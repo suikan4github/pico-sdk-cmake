@@ -4,14 +4,23 @@
 add_executable(blink
         main.c
         initgpio.c
-        getduration.c
         )
 
 # blinkプログラムがpico_stdlibライブラリを使うことを宣言する。
-target_link_libraries(blink pico_stdlib)
+target_link_libraries(blink
+                        algorithm
+                        pico_stdlib)
+
+target_include_directories(blink PUBLIC 
+                        algorithm )
 
 # pico-sdkが用意した関数
 # blinkプログラムからブートローダ形式のファイルを作る
 # ブートローダーファイル(blink.uf2)はbuildディレクトリに
 # 出力される
 pico_add_extra_outputs(blink)
+
+# algorithm サブディレクトリをビルドに追加する
+add_subdirectory(algorithm)
+
+
