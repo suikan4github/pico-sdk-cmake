@@ -8,7 +8,7 @@ Explain how CMake should be configured for the RasPi Pico development with pico-
 pico-sdk固有の癖とcmakeの理解しにくさが組み合わさっているため、
 Raspberry Pi Picoのプログラム開発はディレクトリ構成で躓きがちです。
 
-そこで、このプロジェクトではgitタグを使って複数の構成を
+そこで、このプロジェクトではgitブランチを使って複数の構成を
 紹介し、それぞれについて説明します。
 
 タグ       | 説明
@@ -16,14 +16,14 @@ Raspberry Pi Picoのプログラム開発はディレクトリ構成で躓きが
 [basic](https://github.com/suikan4github/pico-sdk-cmake/tree/basic)      | すべてのソース・ファイルをプロジェクトルートに置きます
 [src](https://github.com/suikan4github/pico-sdk-cmake/tree/src)        | すべてのソース・ファイルをsrcディレクトリに置きます
 [subdir](https://github.com/suikan4github/pico-sdk-cmake/tree/subdir)     | 一部のソース・ファイルをサブディレクトリに置きます
-[subdir_sdk](subdir_sdk) | サブディレクトリに置いたファイルからSDKを参照します
+[subdir_sdk](https://github.com/suikan4github/pico-sdk-cmake/tree/subdir_sdk) | サブディレクトリに置いたファイルからSDKを参照します
 
 各々のタグのREADMEではその構成の解説を読むことができます。
 
 # すべての構成に共通の構造
 
 
-CMakeFileは前半と後半に分かれています。前半はすべての構成に共通であり、
+プロジェクト・ルートの CMakeLists.txt は前半と後半に分かれています。前半はすべての構成に共通であり、
 SDKのダウンロードとビルドの前の各種設定を行っています。
 ユーザーがこの部分に手を入れるのはプロジェクト名を変更するときだけです。
 
