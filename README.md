@@ -11,7 +11,7 @@ Raspberry Pi Picoのプログラム開発はディレクトリ構成で躓きが
 そこで、このプロジェクトではgitブランチを使って複数の構成を
 紹介し、それぞれについて説明します。
 
-タグ       | 説明
+ブランチ           | 説明
 -----------|-----------
 [basic](https://github.com/suikan4github/pico-sdk-cmake/tree/basic)      | すべてのソース・ファイルをプロジェクトルートに置きます
 [src](https://github.com/suikan4github/pico-sdk-cmake/tree/src)        | すべてのソース・ファイルをsrcディレクトリに置きます
