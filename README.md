@@ -3,40 +3,61 @@ Explain how CMake should be configured for the RasPi Pico development with pico-
 
 # 詳細
 
-このプロジェクトはpico-sdkを使ったRaspberry Pi Pico開発について、ディレクトリ構成の面から説明留守ためのものです。
+このプロジェクトは[pico-sdk](https://github.com/raspberrypi/pico-sdk)を使ったRaspberry Pi Pico開発について、ディレクトリ構成の面から説明するためのものです。
 
 pico-sdk固有の癖とcmakeの理解しにくさが組み合わさっているため、
-Raspberry Pi Picoのプログラム開発はディレクトリ構成で躓きがち
-です。
+Raspberry Pi Picoのプログラム開発はディレクトリ構成で躓きがちです。
 
-このプロジェクトではgitの以下のタグを使って構成を調べることができます。
+そこで、このプロジェクトではgitタグを使って複数の構成を
+紹介し、それぞれについて説明します。
 
 タグ       | 説明
 -----------|-----------
-basic      | すべてのソース・ファイルをプロジェクトルートに置きます
-src        | すべてのソース・ファイルをsrcディレクトリに置きます
-subdir     | 一部のソース・ファイルをサブディレクトリに置きます
-subdir_sdk | サブディレクトリに置いたファイルからSDKを参照します
+[basic](https://github.com/suikan4github/pico-sdk-cmake/tree/basic)      | すべてのソース・ファイルをプロジェクトルートに置きます
+[src](https://github.com/suikan4github/pico-sdk-cmake/tree/src)        | すべてのソース・ファイルをsrcディレクトリに置きます
+[subdir](https://github.com/suikan4github/pico-sdk-cmake/tree/subdir)     | 一部のソース・ファイルをサブディレクトリに置きます
+[subdir_sdk](subdir_sdk) | サブディレクトリに置いたファイルからSDKを参照します
 
 各々のタグのREADMEではその構成の解説を読むことができます。
 
-# basic構成
-この構成では、すべてのソース・ファイルとヘッダー・ファイルがプロジェクトの
-ルートディレクトリに置かれています。構成としてはシンプルですが、ルートディレクトリは
-ごちゃごちゃしてしまいます。
+# すべての構成に共通の構造
 
-特にOSSの場合、プロジェクトのルートディレクトリはREADMEやCHANGELOGといった
-プロジェクト自身の説明をするファイルが置かれています。ここにソースを全部置くのは
-あまり良い方法ではありません。
 
 CMakeFileは前半と後半に分かれています。前半はすべての構成に共通であり、
-SDKのダウンロードとビルドの前の各種設定を行っています。ユーザーがこの部分に
-手を入れるのはプロジェクト名を変更するときだけです。
+SDKのダウンロードとビルドの前の各種設定を行っています。
+ユーザーがこの部分に手を入れるのはプロジェクト名を変更するときだけです。
 
 ```CMake
 # プロジェクト名の宣言
 project("my_project")
 ```
+
+pico_sdk_import.cmakeはpico-sdkからコピーしたものであり、これによって
+CMakeコンフィギュレーション時にpico-sdkを自動的に取得できます。
+
+詳しくはpico-sdkを参照してください。
+
+# basic構成
+この構成は、[pico-sdk](https://github.com/raspberrypi/pico-sdk)が紹介している方法です。
+
+すべてのソース・ファイルとヘッダー・ファイルがプロジェクトの
+ルートディレクトリに置かれています。構成としてはシンプルですが、ルート・ディレクトリはごちゃごちゃしてしまいます。
+
+```
+.
+├── CMakeLists.txt
+├── getduration.c
+├── getduration.h
+├── initgpio.c
+├── initgpio.h
+├── LICENSE
+├── main.c
+├── pico_sdk_import.cmake
+└── README.md
+```
+
+特にOSSの場合、プロジェクトのルート・ディレクトリにはREADMEやCHANGELOGといった
+プロジェクト自身の説明をするファイルが置かれています。ここにソース・ファイルを全部置くのはあまり良い方法ではありません。
 
 CMakeLists.txtの後半は以下のようになっています。
 ```CMake
@@ -78,6 +99,7 @@ pico_add_extra_outputs()はpico-sdkの関数です。この関数はblinkプロ�
 
 # ビルド
 このプロジェクトは以下の環境でビルド可能です。
+開発環境の設定方法は[pico-env-easy](https://github.com/suikan4github/pico-env-easy)を参照してください。
 
 - Ubuntu 22.04
 - Windows 11
@@ -85,9 +107,8 @@ pico_add_extra_outputs()はpico-sdkの関数です。この関数はblinkプロ�
 
 CMakeがビルド中に[pico-sdk](https://github.com/raspberrypi/pico-sdk)をダウンロードするため、あらかじめpico-sdkをインストールしておく必要はありません。
 
-環境の設定方法は[pico-env-easy](https://github.com/suikan4github/pico-env-easy)を参照してください。
 
-ビルドはコマンドラインから
+ビルドはコマンドラインから以下のコマンドを実行します。
 ```bash
 mkdir build
 cd build
@@ -95,10 +116,10 @@ cmake ..
 cd ..
 cmake --build build
 ```
-で行えます。また、Visual Studio Codeからもビルドできます。
+また、Visual Studio Codeからもビルドできます。
 
 # ライセンス
 
 このプロジェクトは[MIT ライセンス](LICENSE)にて公開しています。
 
-なお、[pico_sdk_import.cmake](pico_sdk_import.cmake)および[blink.c](blink.c)はRaspberryPiの[pico-sdk](https://github.com/raspberrypi/pico-sdk) v1.5.1よりコピーしたものです。このファイルはBSD 3-Clause "New" or "Revised" Licenseが定める要件により、Raspberry Pi (Trading) Ltd.よりライセンスされています。詳しくは当該ファイルのライセンス要件を読んでください。
+なお、[pico_sdk_import.cmake](pico_sdk_import.cmake)はRaspberryPiの[pico-sdk](https://github.com/raspberrypi/pico-sdk) v1.5.1よりコピーしたものです。このファイルはBSD 3-Clause "New" or "Revised" Licenseが定める要件により、Raspberry Pi (Trading) Ltd.よりライセンスされています。詳しくは当該ファイルのライセンス要件を読んでください。
