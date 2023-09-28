@@ -37,11 +37,13 @@ CMakeコンフィギュレーション時にpico-sdkを自動的に取得でき�
 
 詳しくはpico-sdkを参照してください。
 
-# src構成
-この構成は、すべてのソース・ファイルをsrcディレクトリに格納しています。
+# sub構成
+この構成では、アルゴリズム関連ソース・ファイルを格納する algorithm 
+ディレクトリを新設し、getduration.* をそこに移しています。
 
-ソース・ファイルをルート・ディレクトリの下のディレクトリに
-格納する構成はオーソドックスと言えます。
+プロジェクトが大きくなると、このようにモジュールごとのサブディレクトリを
+作ることになります。なお、getduration.c はアルゴリズムのみ含み、
+pico-sdk の関数にはアクセスしません。
 
 ```
 .
@@ -50,35 +52,37 @@ CMakeコンフィギュレーション時にpico-sdkを自動的に取得でき�
 ├── pico_sdk_import.cmake
 ├── README.md
 └── src
+    ├── algorithm
+    │   ├── CMakeLists.txt
+    │   ├── getduration.c
+    │   └── getduration.h
     ├── CMakeLists.txt
-    ├── getduration.c
-    ├── getduration.h
     ├── initgpio.c
     ├── initgpio.h
     └── main.c
 ```
-CMakeのルールに従い、ルート・ディレクトリとsrcディレクトリの双方に
-CMakeLists.txt が必要です。
+CMakeのルールに従い、algorithm ディレクトリにも CMakeLists.txt を
+置いています。
 
-ルート・ディレクトリの CMakeLists.txt の後半は以下のようになっています。
+ルート・ディレクトリの CMakeLists.txt は、[src](https://github.com/suikan4github/pico-sdk-cmake/tree/src) 構成と同じですので
+説明を省略します。
+
+新しく作った src/algorithm/CMakeLists.txt はとても簡単です。
+
 ```CMake
-# --------------------------------------------------
-# 以下が例題ごとに変わる
-
-# srcサブディレクトリをプロジェクトに加える
-add_subdirectory("src")
+# スタティック・リンク・ライブラリ algorithm を作る。
+# ソースファイルは getduration.c .
+add_library(algorithm STATIC
+    getduration.c)
 ```
-一行だけになりました。
 
-add_subdirectory() は CMake の命令です。この命令は指定したサブディレクトリを
-プロジェクトに追加します。プロジェクトに追加するのであって、インクルード
-しているわけではないことに注意してください。
+add_library() は CMake の命令です。この命令は指定したファイルを集めて
+ライブラリにします。最初の引数でライブラリの名前が algorithm であると
+宣言しています。2番目の引数でスタティック・リンク・ライブラリであると
+宣言しています。
 
-CMakeでは減速として各ディレクトリの CMakeLists.txt がそのディレクトリでの
-ビルドのルールを定義します。add_subdirectory() は、指定したディレクトリでの
-ビルドを、プロジェクトのビルドに組み込む命令です。
 
-src/CMakeLists.txt は以下のようになっています。
+src/CMakeLists.txt は記述が増えました。
 ```CMake
 # blinkプログラムがmain.cとinit.cからなることを宣言する
 # add_executable()で宣言した名前(blink)は実行ファイルの名前
@@ -86,11 +90,16 @@ src/CMakeLists.txt は以下のようになっています。
 add_executable(blink
         main.c
         initgpio.c
-        getduration.c
         )
 
 # blinkプログラムがpico_stdlibライブラリを使うことを宣言する。
-target_link_libraries(blink pico_stdlib)
+target_link_libraries(blink
+                        algorithm
+                        pico_stdlib)
+
+# サブディレクトリalgorithmをインクルード・パスに追加する
+target_include_directories(blink PUBLIC 
+                        algorithm )
 
 # pico-sdkが用意した関数
 # blinkプログラムからブートローダ形式のファイルを作る
@@ -98,14 +107,26 @@ target_link_libraries(blink pico_stdlib)
 # 出力される
 pico_add_extra_outputs(blink)
 
+# algorithm サブディレクトリをビルドに追加する
+add_subdirectory(algorithm)
 ```
 
-これは、[basic](https://github.com/suikan4github/pico-sdk-cmake/tree/basic) 構成のCMakeLists.txtの後半部分そのものです。
+getduration.c が algorithm サブディレクトリに移ったため、
+add_executableのリストから消えています。
 
-CMakeLists.txt の内容は変わりませんが、pico_add_extra_outputs() が
-src ディレクトリに移ったため、生成物のディレクトリも変わります。
+一方、3つほど追加があります。
 
-具体的には、ブートローダーファイルは build/src/blink.uf2 になります。
+1. target_link_libraries() に algorithm ライブラリが増えています。これは blink プログラムのビルドに algorithm ライブラリが必要であるためです。
+1. target_include_directories() 命令が新しく加わりました。この命令では
+blink プログラムのビルド時に、algorithm ディレクトリを含めるよう指示しています。
+1. add_subdirectory() で、algorithm ディレクトリをビルドに追加しています。
+
+ややごちゃごちゃしているように見えますが、CMake による階層ディレクトリの
+管理方法としては普通です。algorithm ディレクトリにソース・ファイルを
+追加する場合は、 src/algorithm/CMakeLists.txt の add_library に
+ファイル名を追加します。
+
+ブートローダーファイルは build/src/blink.uf2 です。
 
 # ビルド
 このプロジェクトは以下の環境でビルド可能です。

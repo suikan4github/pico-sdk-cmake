@@ -11,6 +11,7 @@ target_link_libraries(blink
                         algorithm
                         pico_stdlib)
 
+# サブディレクトリalgorithmをインクルード・パスに追加する
 target_include_directories(blink PUBLIC 
                         algorithm )
 
