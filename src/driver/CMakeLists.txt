@@ -3,9 +3,12 @@
 add_library(driver INTERFACE)
 
 # driver ライブラリが initgpio.c からなることを宣言する。
-target_sources( driver INTERFACE 
-            initgpio.c)
+target_sources( driver INTERFACE initgpio.c)
+
+# このディレクトリをalgorithmのインクルード・パスに追加する
+# algorithmを使うターゲットのビルドに使用される。
+target_include_directories(driver INTERFACE . )
 
 # driver ライブラリが pico_stdlibに依存していることを宣言する。
-target_link_libraries(driver INTERFACE
-                        pico_stdlib)
+target_link_libraries(driver INTERFACE pico_stdlib)
+
